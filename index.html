@@ -13,7 +13,9 @@
 
 <div class="container">
   <h3>LIST OF USERS</h3>
-  <button type="button" class="btn btn-info">Create</button>
+  <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userFormModal">Create</button>
+  <br>
+  <br>
   <div>
     <table id="users-table" class="table">
       <thead>
@@ -30,11 +32,45 @@
       </tbody>
     </table>
   </div>
+
+  <div id="userFormModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">User</h4>
+        </div>
+        <div class="modal-body">
+          <div>
+            <form>
+              <div class="form-group">
+                <label for="userFirstName">First name</label>
+                <input type="text" class="form-control" id="userFirstName" placeholder="Enter first name">
+              </div>
+              <div class="form-group">
+                <label for="userLastName">Last name</label>
+                <input type="text" class="form-control" id="userLastName" placeholder="Enter last name">
+              </div>
+              <div class="form-group">
+                <label for="userEmail">Email address</label>
+                <input type="email" class="form-control" id="userEmail" placeholder="Enter email">
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-info" data-dismiss="modal">Submit</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>
 </body>
 <script>
 $(document).ready(function() {
-  const getUsers = () => {
+  const getUsersApi = () => {
     return new Promise((resolve, reject) => {
       $.ajax({
         url: '/get.php',
@@ -51,26 +87,59 @@ $(document).ready(function() {
     });
   }
 
+  const deleteUserApi = (id) => {
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        url: '/delete.php',
+        type: 'DELETE',
+        dataType: 'json',
+        contentType: 'application/json',
+        data: JSON.stringify({ id }),
+        success: (data) => {
+          resolve(data);
+        },
+        error: (error) => {
+          console.log(error);
+          reject(error);
+        }
+      });
+    });
+  }
+
+  /** delete user **/
+  const deleteUser = async (id) => {
+    await deleteUserApi(id);
+    await fetchUsers();
+  }
+
+  /** list users **/
   const fetchUsers = async () => {
-    getUsers()
+    getUsersApi()
     .then(result => {
       if (result.length) {
         let rows = result.map(user => {
           let htmlRow = '<tr>'
-            + '<td>'+ user.id + '</td>'
-            + '<td>'+ user.first_name + '</td>'
-            + '<td>'+ user.last_name + '</td>'
-            + '<td>'+ user.email + '</td>'
-            + '<td>'+ user.created_at + '</td>'
+            + '<td>' + user.id + '</td>'
+            + '<td>' + user.first_name + '</td>'
+            + '<td>' + user.last_name + '</td>'
+            + '<td>' + user.email + '</td>'
+            + '<td>' + user.created_at + '</td>'
             + '<td>'
-            + '<button type="button" class="btn btn-warning" style="margin-right: 5px;">Edit</button>'
-            + '<button type="button" class="btn btn-danger">Delete</button>'
+            + '<button type="button" class="edit-user btn btn-warning" style="margin-right: 5px;">Edit</button>'
+            + '<button type="button" data-user-id="' + user.id + '" class="delete-user btn btn-danger">Delete</button>'
             + '</td>'
             + '</tr>';
 
           return htmlRow;
         });
         $('#users-table tbody').empty().append(rows.join(''));
+        $('#users-table tbody').find('.delete-user').on('click', function() {
+          let userId = $(this).data('user-id');
+          let proceed = confirm('Are you sure you want to delete this user?');
+          if (proceed) {
+            deleteUser(userId);
+          }
+        });
       }
     })
     .catch(error => {
