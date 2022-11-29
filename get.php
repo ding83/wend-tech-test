@@ -15,9 +15,11 @@ try {
       'first_name' => $row['first_name'],
       'last_name'  => $row['last_name'],
       'email'      => $row['email'],
+      'created_at' => $row['created_at'],
     ]);
   }
 
+  header("HTTP/1.1 200 OK");
   echo json_encode($data);
 } catch (\PDOException $e) {
   header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);

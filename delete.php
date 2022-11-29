@@ -23,6 +23,7 @@ try {
     throw new Exception("The id {$id} is not found.");
   }
 
+  header("HTTP/1.1 200 OK");
   echo json_encode(['status' => 'success']);
 } catch (\PDOException $e) {
   header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);

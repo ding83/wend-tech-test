@@ -1,10 +1,83 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>WEND TECH API</title>
-  </head>
-  <body>
-  <p>Welcome to simple API</p>
-  </body>
+<html lang="en">
+<head>
+  <title>WEND TECH TEST</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+</head>
+<body>
 
+<div class="container">
+  <h3>LIST OF USERS</h3>
+  <button type="button" class="btn btn-info">Create</button>
+  <div>
+    <table id="users-table" class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">First Name</th>
+          <th scope="col">Last Name</th>
+          <th scope="col">Email</th>
+          <th scope="col">Created</th>
+          <th scope="col">&nbsp;</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+<script>
+$(document).ready(function() {
+  const getUsers = () => {
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        url: '/get.php',
+        type: 'GET',
+        dataType: 'json',
+        success: (response) => {
+          resolve(response);
+        },
+        error: (error) => {
+          console.log(error);
+          reject();
+        }
+      });
+    });
+  }
+
+  const fetchUsers = async () => {
+    getUsers()
+    .then(result => {
+      if (result.length) {
+        let rows = result.map(user => {
+          let htmlRow = '<tr>'
+            + '<td>'+ user.id + '</td>'
+            + '<td>'+ user.first_name + '</td>'
+            + '<td>'+ user.last_name + '</td>'
+            + '<td>'+ user.email + '</td>'
+            + '<td>'+ user.created_at + '</td>'
+            + '<td>'
+            + '<button type="button" class="btn btn-warning" style="margin-right: 5px;">Edit</button>'
+            + '<button type="button" class="btn btn-danger">Delete</button>'
+            + '</td>'
+            + '</tr>';
+
+          return htmlRow;
+        });
+        $('#users-table tbody').empty().append(rows.join(''));
+      }
+    })
+    .catch(error => {
+      console.log('fetchUsers', error);
+    });
+  }
+  fetchUsers();
+});
+</script>
 </html>

@@ -29,7 +29,8 @@ try {
   $stmt->execute($data);
   $id = $pdo->lastInsertId();
   $data['id'] = $id;
-  
+
+  header("HTTP/1.1 200 OK");
   echo json_encode(['status' => 'success', 'data' => $data]);
 } catch (\PDOException $e) {
   header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
