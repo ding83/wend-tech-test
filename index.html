@@ -42,7 +42,7 @@
         </div>
         <div class="modal-body">
           <div>
-            <form>
+            <form id="user-form">
               <div class="form-group">
                 <label for="userFirstName">First name</label>
                 <input type="text" class="form-control" id="userFirstName" placeholder="Enter first name">
@@ -60,10 +60,9 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-info" data-dismiss="modal">Submit</button>
+          <button type="button" class="btn btn-info submit-user-from" data-dismiss="modal">Submit</button>
         </div>
       </div>
-
     </div>
   </div>
 </div>
@@ -97,6 +96,25 @@ $(document).ready(function() {
         dataType: 'json',
         contentType: 'application/json',
         data: JSON.stringify({ id }),
+        success: (data) => {
+          resolve(data);
+        },
+        error: (error) => {
+          console.log(error);
+          reject(error);
+        }
+      });
+    });
+  }
+
+  const createUserApi = (data) => {
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        url: '/post.php',
+        type: 'POST',
+        dataType: 'json',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
         success: (data) => {
           resolve(data);
         },
@@ -149,6 +167,26 @@ $(document).ready(function() {
       console.log('fetchUsers', error);
     });
   }
+
+  /** form submitted **/
+  $('.submit-user-from').on('click', function() {
+    let first_name = $('#userFirstName').val();
+    let last_name = $('#userLastName').val();
+    let email = $('#userEmail').val();
+    let data = { first_name, last_name, email };
+
+    createUserApi(data)
+    .then(response => {
+      fetchUsers();
+      $('#user-form').trigger('reset');
+    })
+    .catch(error => {
+      console.log(error);
+      fetchUsers();
+      $('#user-form').trigger('reset');
+    });
+  });
+
   fetchUsers();
 });
 </script>
