@@ -126,6 +126,25 @@ $(document).ready(function() {
     });
   }
 
+  const updateUserApi = (data) => {
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        url: '/patch.php',
+        type: 'PATCH',
+        dataType: 'json',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: (data) => {
+          resolve(data);
+        },
+        error: (error) => {
+          console.log(error);
+          reject(error);
+        }
+      });
+    });
+  }
+
   /** delete user **/
   const deleteUser = async (id) => {
     await deleteUserApi(id);
