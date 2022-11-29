@@ -7,6 +7,9 @@ $json = file_get_contents('php://input');
 $request = json_decode($json, true);
 
 try {
+  if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    throw new Exception("Invalid request method {$_SERVER['REQUEST_METHOD']}.");
+  }
   if (empty($request['first_name']) || empty($request['last_name']) || empty($request['email'])) {
     throw new Exception("Required inputs are missing.");
   }
